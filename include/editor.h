@@ -1,6 +1,10 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
 #include <stddef.h>
 #include <termios.h>
 #include <time.h>
@@ -19,6 +23,12 @@ enum editorKey {
   PAGE_DOWN
 };
 
+typedef enum editorMode {
+  MODE_NORMAL = 0,
+  MODE_INSERT = 1,
+  MODE_VISUAL = 2
+} editorMode;
+
 typedef struct erow {
   int size;
   char *chars;
@@ -34,6 +44,7 @@ typedef struct abuf {
 struct editorConfig {
   int cx, cy;
   int rx;
+  editorMode mode;
   int rowoff;
   int coloff;
   int screenrows;
@@ -45,6 +56,10 @@ struct editorConfig {
   char statusmsg[80];
   time_t statusmsg_time;
   struct termios orig_termios;
+
+  /* Visual-mode selection (charwise). sel_* are inclusive endpoints. */
+  int sel_sx, sel_sy;
+  int sel_ex, sel_ey;
 };
 
 extern struct editorConfig E;
@@ -80,5 +95,8 @@ void editorMoveCursor(int key);
 void editorProcessKeypress(void);
 
 void initEditor(void);
+
+/* Deletes the currently selected Visual range and moves cursor to start. */
+void editorDelSelection(void);
 
 #endif
