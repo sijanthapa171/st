@@ -48,8 +48,6 @@ void editorScroll(void) {
 static void editorDrawRows(abuf *ab) {
   int y;
 
-  /* Visual selection endpoints are charwise, inclusive.
-   * We normalize once per draw for performance. */
   int has_visual = (E.mode == MODE_VISUAL);
   int vs_sy = 0, vs_sx = 0, vs_ey = 0, vs_ex = 0;
   if (has_visual) {

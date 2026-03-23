@@ -53,7 +53,6 @@ struct editorConfig {
   time_t statusmsg_time;
   struct termios orig_termios;
 
-  /* Visual-mode selection (charwise). sel_* are inclusive endpoints. */
   int sel_sx, sel_sy;
   int sel_ex, sel_ey;
 };
@@ -92,10 +91,8 @@ void editorProcessKeypress(void);
 
 void initEditor(void);
 
-/* Deletes the currently selected Visual range and moves cursor to start. */
 void editorDelSelection(void);
 
-/* Executes an Ex-style command (from `:`). Returns 1 if handled. */
 int editorExecuteExCommand(const char *cmd);
 
 #endif

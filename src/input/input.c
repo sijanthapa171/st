@@ -122,7 +122,6 @@ void editorProcessKeypress(void) {
       break;
   }
 
-  // ESC switches out of Insert/Visual to Normal.
   if (c == '\x1b') {
     if (E.mode == MODE_INSERT || E.mode == MODE_VISUAL) {
       E.mode = MODE_NORMAL;
