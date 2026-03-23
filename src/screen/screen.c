@@ -80,7 +80,9 @@ static void editorDrawRows(abuf *ab) {
     if (filerow >= E.numrows) {
       if (E.numrows == 0 && y == E.screenrows / 3) {
         char welcome[80];
-        int welcomelen = snprintf(welcome, sizeof(welcome), "Terminal Notepad -- Ctrl+S Save | Ctrl+Q Quit");
+        int welcomelen =
+            snprintf(welcome, sizeof(welcome),
+                     "Terminal Notepad -- Ctrl+S Save | Ctrl+Q Quit");
         if (welcomelen > E.screencols) welcomelen = E.screencols;
         int padding = (E.screencols - welcomelen) / 2;
         if (padding) {
@@ -135,13 +137,13 @@ static void editorDrawStatusBar(abuf *ab) {
   abAppend(ab, "\x1b[7m", 4);
   char status[80], rstatus[80];
   int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
-      E.filename ? E.filename : "[No Name]",
-      E.numrows,
-      E.dirty ? "(modified)" : "");
+                     E.filename ? E.filename : "[No Name]", E.numrows,
+                     E.dirty ? "(modified)" : "");
   const char *mode_str = (E.mode == MODE_NORMAL)
                             ? "NORMAL"
                             : (E.mode == MODE_INSERT ? "INSERT" : "VISUAL");
-  int rlen = snprintf(rstatus, sizeof(rstatus), "%s Ln %d, Col %d", mode_str, E.cy + 1, E.cx + 1);
+  int rlen = snprintf(rstatus, sizeof(rstatus), "%s Ln %d, Col %d", mode_str,
+                       E.cy + 1, E.cx + 1);
   if (len > E.screencols) len = E.screencols;
   abAppend(ab, status, len);
 
@@ -181,7 +183,8 @@ void editorRefreshScreen(void) {
   editorDrawMessageBar(&ab);
 
   char buf[32];
-  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+  snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1,
+           (E.rx - E.coloff) + 1);
   abAppend(&ab, buf, (int)strlen(buf));
 
   abAppend(&ab, "\x1b[?25h", 6);
@@ -192,3 +195,4 @@ void editorRefreshScreen(void) {
   }
   abFree(&ab);
 }
+

@@ -100,7 +100,10 @@ void editorProcessKeypress(void) {
   switch (c) {
     case CTRL_KEY('q'):
       if (E.dirty && quit_times > 0) {
-        editorSetStatusMessage("WARNING!!! File has unsaved changes. Press Ctrl-Q %d more times to quit.", quit_times);
+        editorSetStatusMessage(
+            "WARNING!!! File has unsaved changes. Press Ctrl-Q %d more times "
+            "to quit.",
+            quit_times);
         quit_times--;
         return;
       }
@@ -350,3 +353,4 @@ void editorProcessKeypress(void) {
 
   quit_times = 3;
 }
+

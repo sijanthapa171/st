@@ -60,3 +60,4 @@ void editorSave(void) {
   free(buf);
   editorSetStatusMessage("Save failed: %s", strerror(errno));
 }
+

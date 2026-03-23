@@ -130,3 +130,4 @@ int getWindowSize(int *rows, int *cols) {
   *rows = ws.ws_row;
   return 0;
 }
+
