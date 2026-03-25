@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -std=c99 -g
 LDFLAGS =
 
-SRC_DIR = src core ui input commands utils
+SRC_DIR = src src/core src/ui src/input src/commands src/utils
 INC_DIR = include
 BUILD_DIR = build
 BIN_DIR = bin
