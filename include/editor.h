@@ -39,6 +39,7 @@ struct editorConfig {
     struct termios orig_termios;
     enum EditorMode mode;
     int quit_times;
+    int command_count;
 };
 
 extern struct editorConfig E;
