@@ -3,6 +3,7 @@
 #include "editor.h"
 #include "input.h"
 #include "commands.h"
+#include "core.h"
 
 void editorMoveCursor(int key) {
     erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
@@ -106,8 +107,25 @@ void normalModeProcessKey(int c) {
                 E.cx = E.row[E.cy].size;
             break;
             
+        case 'd':
+            E.command_count = 0;
+            if (E.pending_key == 'd') {
+                /* dd: delete current line */
+                E.pending_key = 0;
+                if (E.numrows == 0) break;
+                editorDelRow(E.cy);
+                if (E.cy >= E.numrows && E.cy > 0) E.cy--;
+                E.cx = 0;
+                editorSetStatusMessage("");
+            } else {
+                E.pending_key = 'd';
+                editorSetStatusMessage("d");
+            }
+            break;
+
         case CTRL_KEY('q'):
             E.command_count = 0;
+            E.pending_key = 0;
             if (E.dirty && E.quit_times > 0) {
                 editorSetStatusMessage("WARNING!!! File has unsaved changes. "
                                        "Press Ctrl-Q %d more times to quit.", E.quit_times);
@@ -121,6 +139,7 @@ void normalModeProcessKey(int c) {
             
         default:
             E.command_count = 0;
+            E.pending_key = 0;
             break;
     }
 }

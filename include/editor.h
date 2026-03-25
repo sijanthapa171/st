@@ -40,6 +40,7 @@ struct editorConfig {
     enum EditorMode mode;
     int quit_times;
     int command_count;
+    int pending_key;
 };
 
 extern struct editorConfig E;
