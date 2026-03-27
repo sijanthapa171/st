@@ -59,6 +59,17 @@ void editorScroll(void) {
     if (E.rx >= E.coloff + E.screencols) {
         E.coloff = E.rx - E.screencols + 1;
     }
+
+    int lines = E.numrows;
+    E.ln_width = 2; 
+    if (lines > 0) {
+        int digits = 0;
+        while (lines > 0) {
+            digits++;
+            lines /= 10;
+        }
+        E.ln_width = digits + 1; 
+    }
 }
 
 void editorDrawRows(struct abuf *ab) {
@@ -102,12 +113,26 @@ void editorDrawRows(struct abuf *ab) {
                 abAppend(ab, welcome, welcomelen);
             } else {
                 abAppend(ab, "~", 1);
+                for (int i = 1; i < E.ln_width; i++) abAppend(ab, " ", 1);
             }
         } else {
+            char ln[16];
+            int ln_len = snprintf(ln, sizeof(ln), "%*d ", E.ln_width - 1, filerow + 1);
+            
+            if (filerow == E.cy) {
+                abAppend(ab, "\x1b[33m", 5); 
+                abAppend(ab, ln, ln_len);
+                abAppend(ab, "\x1b[m", 3);
+            } else {
+                abAppend(ab, "\x1b[90m", 5); 
+                abAppend(ab, ln, ln_len);
+                abAppend(ab, "\x1b[m", 3);
+            }
+
             int len = E.row[filerow].rsize - E.coloff;
             if (len < 0) len = 0;
-            if (len > E.screencols) len = E.screencols;
-            abAppend(ab, &E.row[filerow].render[E.coloff], len);
+            if (len > E.screencols - E.ln_width) len = E.screencols - E.ln_width;
+            if (len > 0) abAppend(ab, &E.row[filerow].render[E.coloff], len);
         }
         
         abAppend(ab, "\x1b[K", 3);
@@ -168,7 +193,7 @@ void editorRefreshScreen(void) {
     if (E.mode == MODE_HELP) {
         snprintf(buf, sizeof(buf), "\x1b[%d;%dH", 1, 1);
     } else {
-        snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+        snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1 + E.ln_width);
     }
     abAppend(&ab, buf, strlen(buf));
     
