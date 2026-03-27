@@ -22,6 +22,13 @@ typedef struct erow {
     char *render;
 } erow;
 
+typedef struct UndoStep {
+    erow *row;
+    int numrows;
+    int cx, cy;
+    int dirty;
+} UndoStep;
+
 struct editorConfig {
     int cx, cy;
     int rx;
@@ -42,12 +49,9 @@ struct editorConfig {
     int command_count;
     int pending_key;
     
-    /* Undo state */
-    erow *undo_row;
-    int undo_numrows;
-    int undo_cx, undo_cy;
-    int undo_dirty;
-    int undo_available;
+    /* Undo stack */
+    UndoStep undo_stack[50];
+    int undo_stack_size;
 };
 
 extern struct editorConfig E;
