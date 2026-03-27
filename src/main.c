@@ -10,9 +10,9 @@ int main(int argc, char *argv[]) {
     
     if (argc >= 2) {
         editorOpen(argv[1]);
+    } else {
+        editorSetStatusMessage("HELP: :w = save | :q = quit | i = insert mode | h,j,k,l = move");
     }
-    
-    editorSetStatusMessage("HELP: :w = save | :q = quit | i = insert mode | h,j,k,l = move");
     
     while (1) {
         editorRefreshScreen();

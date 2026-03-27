@@ -7,6 +7,8 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include "utils.h"
 #include "editor.h"
 #include "core.h"
@@ -34,8 +36,54 @@ void editorOpen(char *filename) {
     free(E.filename);
     E.filename = strdup(filename);
     
+    struct stat statbuf;
+    if (stat(filename, &statbuf) == 0 && S_ISDIR(statbuf.st_mode)) {
+        DIR *d = opendir(filename);
+        if (!d) {
+            editorSetStatusMessage("Error: Could not open directory");
+            return;
+        }
+        
+        char header[256];
+        snprintf(header, sizeof(header), "Directory: %s", filename);
+        editorInsertRow(E.numrows, header, strlen(header));
+        editorInsertRow(E.numrows, "----------", 10);
+        
+        struct dirent *dir;
+        while ((dir = readdir(d)) != NULL) {
+            if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) continue;
+            
+            char entry[256];
+            int is_dir = (dir->d_type == DT_DIR);
+            
+            // Handle filesystems where d_type is not supported
+            if (dir->d_type == DT_UNKNOWN) {
+                char full_path[1024];
+                snprintf(full_path, sizeof(full_path), "%s/%s", filename, dir->d_name);
+                struct stat entry_stat;
+                if (stat(full_path, &entry_stat) == 0 && S_ISDIR(entry_stat.st_mode)) {
+                    is_dir = 1;
+                }
+            }
+            
+            if (is_dir) {
+                snprintf(entry, sizeof(entry), "  %s/", dir->d_name);
+            } else {
+                snprintf(entry, sizeof(entry), "  %s", dir->d_name);
+            }
+            editorInsertRow(E.numrows, entry, strlen(entry));
+        }
+        closedir(d);
+        E.dirty = 0;
+        editorSetStatusMessage("Opened directory: %s (%d items)", filename, E.numrows - 2);
+        return;
+    }
+    
     FILE *fp = fopen(filename, "r");
-    if (!fp) return;
+    if (!fp) {
+        editorSetStatusMessage("Error: Could not open file %s", filename);
+        return;
+    }
     
     char *line = NULL;
     size_t linecap = 0;
