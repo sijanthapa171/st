@@ -1,5 +1,5 @@
 {
-  description = "Vedit - A Vim-like C Text Editor";
+  description = "Vedit";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -12,6 +12,34 @@
       pkgsFor = system: import nixpkgs { inherit system; };
     in
     {
+      packages = forAllSystems (system:
+        let
+          pkgs = pkgsFor system;
+        in
+        {
+          vedit = pkgs.stdenv.mkDerivation {
+            pname = "vedit";
+            version = "0.1.0";
+            src = ./.;
+
+            buildInputs = with pkgs; [
+              gcc
+              gnumake
+            ];
+
+            buildPhase = ''
+              make
+            '';
+
+            installPhase = ''
+              mkdir -p $out/bin
+              cp bin/vedit $out/bin/
+            '';
+          };
+          default = self.packages.${system}.vedit;
+        }
+      );
+
       devShells = forAllSystems (system:
         let
           pkgs = pkgsFor system;
@@ -24,11 +52,6 @@
               gnumake
               pkg-config
             ];
-
-            shellHook = ''
-              echo "Vedit Development Environment Loaded"
-              echo "Available tools: gcc, gdb, make, pkg-config"
-            '';
           };
         }
       );
