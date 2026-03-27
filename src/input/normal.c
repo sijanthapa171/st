@@ -49,8 +49,14 @@ void normalModeProcessKey(int c) {
     switch (c) {
         case 'i':
             E.command_count = 0;
+            editorSaveUndoState();
             E.mode = MODE_INSERT;
             editorSetStatusMessage("-- INSERT --");
+            break;
+            
+        case 'u':
+            E.command_count = 0;
+            editorUndo();
             break;
             
         case ':':
@@ -111,6 +117,14 @@ void normalModeProcessKey(int c) {
             E.command_count = 0;
             if (E.cy < E.numrows)
                 E.cx = E.row[E.cy].size;
+            break;
+            
+        case 'x':
+            E.command_count = 0;
+            if (E.cy < E.numrows && E.row[E.cy].size > 0) {
+                editorSaveUndoState();
+                editorRowDelChar(&E.row[E.cy], E.cx);
+            }
             break;
             
         case 'd':

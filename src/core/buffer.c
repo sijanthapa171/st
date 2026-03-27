@@ -29,6 +29,8 @@ void editorUpdateRow(erow *row) {
 void editorInsertRow(int at, const char *s, size_t len) {
     if (at < 0 || at > E.numrows) return;
     
+    editorSaveUndoState();
+
     E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
     memmove(&E.row[at + 1], &E.row[at], sizeof(erow) * (E.numrows - at));
     
@@ -52,6 +54,7 @@ void editorFreeRow(erow *row) {
 
 void editorDelRow(int at) {
     if (at < 0 || at >= E.numrows) return;
+    editorSaveUndoState();
     editorFreeRow(&E.row[at]);
     memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
     E.numrows--;
@@ -66,6 +69,64 @@ void editorClearBuffer(void) {
     E.row = NULL;
     E.numrows = 0;
     E.dirty = 0;
+}
+
+void editorSaveUndoState(void) {
+    if (E.undo_available) {
+        for (int i = 0; i < E.undo_numrows; i++) {
+            free(E.undo_row[i].chars);
+            free(E.undo_row[i].render);
+        }
+        free(E.undo_row);
+        E.undo_available = 0;
+    }
+    
+    if (E.numrows > 0) {
+        E.undo_row = malloc(sizeof(erow) * E.numrows);
+        for (int i = 0; i < E.numrows; i++) {
+            E.undo_row[i].size = E.row[i].size;
+            E.undo_row[i].chars = malloc(E.row[i].size + 1);
+            memcpy(E.undo_row[i].chars, E.row[i].chars, E.row[i].size + 1);
+            E.undo_row[i].rsize = E.row[i].rsize;
+            E.undo_row[i].render = malloc(E.row[i].rsize + 1);
+            memcpy(E.undo_row[i].render, E.row[i].render, E.row[i].rsize + 1);
+        }
+    } else {
+        E.undo_row = NULL;
+    }
+    
+    E.undo_numrows = E.numrows;
+    E.undo_cx = E.cx;
+    E.undo_cy = E.cy;
+    E.undo_dirty = E.dirty;
+    E.undo_available = 1;
+}
+
+void editorUndo(void) {
+    if (!E.undo_available) {
+        editorSetStatusMessage("Nothing to undo");
+        return;
+    }
+    
+    erow *tmp_row = E.row;
+    int tmp_numrows = E.numrows;
+    int tmp_cx = E.cx;
+    int tmp_cy = E.cy;
+    int tmp_dirty = E.dirty;
+    
+    E.row = E.undo_row;
+    E.numrows = E.undo_numrows;
+    E.cx = E.undo_cx;
+    E.cy = E.undo_cy;
+    E.dirty = E.undo_dirty;
+    
+    E.undo_row = tmp_row;
+    E.undo_numrows = tmp_numrows;
+    E.undo_cx = tmp_cx;
+    E.undo_cy = tmp_cy;
+    E.undo_dirty = tmp_dirty;
+    
+    editorSetStatusMessage("Undo performed");
 }
 
 void editorRowInsertChar(erow *row, int at, int c) {

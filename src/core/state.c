@@ -23,6 +23,10 @@ void initEditor(void) {
     E.mode = MODE_NORMAL;
     E.quit_times = KILO_QUIT_TIMES;
     
+    E.undo_row = NULL;
+    E.undo_numrows = 0;
+    E.undo_available = 0;
+    
     if (getWindowSize(&E.screenrows, &E.screencols) == -1) {
         die("getWindowSize");
     }

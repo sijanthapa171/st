@@ -9,6 +9,8 @@ void editorInsertRow(int at, const char *s, size_t len);
 void editorFreeRow(erow *row);
 void editorDelRow(int at);
 void editorClearBuffer(void);
+void editorSaveUndoState(void);
+void editorUndo(void);
 void editorRowInsertChar(erow *row, int at, int c);
 void editorRowAppendString(erow *row, const char *s, size_t len);
 void editorRowDelChar(erow *row, int at);

@@ -107,14 +107,12 @@ void editorSelectEntry(void) {
     
     struct stat statbuf;
     if (stat(E.filename, &statbuf) != 0 || !S_ISDIR(statbuf.st_mode)) {
-        // Not a directory listing, nothing to select
         return;
     }
 
     if (E.cy < 2 || E.cy >= E.numrows) return;
 
     char *row_text = E.row[E.cy].chars;
-    // Skip the leading spaces added for formatting
     while (*row_text == ' ') row_text++;
 
     char *name = strdup(row_text);
@@ -125,11 +123,9 @@ void editorSelectEntry(void) {
 
     char next_path[1024];
     if (strcmp(name, "..") == 0) {
-        // Handle ".." navigate up
         char *last_slash = strrchr(E.filename, '/');
         if (last_slash) {
             if (last_slash == E.filename) {
-                // Root directory
                 strcpy(next_path, "/");
             } else {
                 size_t path_len = last_slash - E.filename;
@@ -139,8 +135,6 @@ void editorSelectEntry(void) {
         } else if (strcmp(E.filename, ".") != 0) {
             strcpy(next_path, "..");
         } else {
-            // If already at ".", we can't easily go up without knowing absolute path
-            // But let's try ".." anyway
             strcpy(next_path, "..");
         }
     } else {

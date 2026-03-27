@@ -41,6 +41,13 @@ struct editorConfig {
     int quit_times;
     int command_count;
     int pending_key;
+    
+    /* Undo state */
+    erow *undo_row;
+    int undo_numrows;
+    int undo_cx, undo_cy;
+    int undo_dirty;
+    int undo_available;
 };
 
 extern struct editorConfig E;
