@@ -56,7 +56,7 @@ void editorOpen(char *filename) {
         while ((dir = readdir(d)) != NULL) {
             if (strcmp(dir->d_name, ".") == 0) continue;
             
-            char entry[256];
+            char entry[512];
             int is_dir = (dir->d_type == DT_DIR);
             
             if (dir->d_type == DT_UNKNOWN) {

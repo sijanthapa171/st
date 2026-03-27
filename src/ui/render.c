@@ -147,7 +147,6 @@ void editorDrawRows(struct abuf *ab) {
                     if (filerow > sy && filerow < ey) is_sel = 1;
                     else if (sy == ey && filerow == sy) {
                         if (filerow == sy) {
-                            int cur_cx = 0;
                             if (cur_rx >= sx && cur_rx <= ex) is_sel = 1;
                         }
                     } else if (filerow == sy) {
