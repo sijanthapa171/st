@@ -116,11 +116,12 @@ void editorDrawRows(struct abuf *ab) {
                 for (int i = 1; i < E.ln_width; i++) abAppend(ab, " ", 1);
             }
         } else {
+            int display_num = (filerow == E.cy) ? (filerow + 1) : (filerow > E.cy ? filerow - E.cy : E.cy - filerow);
             char ln[16];
-            int ln_len = snprintf(ln, sizeof(ln), "%*d ", E.ln_width - 1, filerow + 1);
+            int ln_len = snprintf(ln, sizeof(ln), "%*d ", E.ln_width - 1, display_num);
             
             if (filerow == E.cy) {
-                abAppend(ab, "\x1b[33m", 5); 
+                abAppend(ab, "\x1b[1;33m", 7); 
                 abAppend(ab, ln, ln_len);
                 abAppend(ab, "\x1b[m", 3);
             } else {
