@@ -59,7 +59,7 @@ struct editorConfig {
 
     char explorer_search_pattern[128];
     int explorer_show_hidden;
-    char explorer_clip_path[1024];
+    char explorer_clip_path[4096];
     int explorer_clip_is_cut;
 };
 

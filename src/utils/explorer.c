@@ -35,7 +35,7 @@ void editorSelectEntry(void) {
     char *name = explorerGetCurrentName();
     if (!name) return;
 
-    char next_path[1024];
+    char next_path[8192];
     if (strcmp(name, "..") == 0) {
         char *last_slash = strrchr(E.filename, '/');
         if (last_slash) {
@@ -72,7 +72,7 @@ void explorerCreateFile(void) {
     char *name = editorPrompt("Create file: %s");
     if (name == NULL) return;
 
-    char path[1024];
+    char path[8192];
     snprintf(path, sizeof(path), "%s/%s", E.filename, name);
     int fd = open(path, O_RDWR | O_CREAT, 0644);
     if (fd != -1) {
@@ -88,7 +88,7 @@ void explorerCreateFolder(void) {
     char *name = editorPrompt("Create folder: %s");
     if (name == NULL) return;
 
-    char path[1024];
+    char path[8192];
     snprintf(path, sizeof(path), "%s/%s", E.filename, name);
     if (mkdir(path, 0755) == 0) {
         explorerRefresh();
@@ -113,7 +113,7 @@ void explorerRename(void) {
         return;
     }
 
-    char old_path[1024], new_path[1024];
+    char old_path[8192], new_path[8192];
     snprintf(old_path, sizeof(old_path), "%s/%s", E.filename, old_name);
     snprintf(new_path, sizeof(new_path), "%s/%s", E.filename, new_name);
 
@@ -138,13 +138,13 @@ void explorerDelete(void) {
     snprintf(prompt, sizeof(prompt), "Delete %s? (y/n): %%s", name);
     char *confirm = editorPrompt(prompt);
     if (confirm && (confirm[0] == 'y' || confirm[0] == 'Y')) {
-        char path[1024];
+        char path[8192];
         snprintf(path, sizeof(path), "%s/%s", E.filename, name);
         
         struct stat st;
         if (stat(path, &st) == 0) {
             if (S_ISDIR(st.st_mode)) {
-                char cmd[2048];
+                char cmd[16384];
                 snprintf(cmd, sizeof(cmd), "rm -rf \"%s\"", path);
                 if (system(cmd) == 0) explorerRefresh();
                 else editorSetStatusMessage("Error: Failed to delete folder %s", name);
@@ -192,7 +192,7 @@ void explorerPaste(void) {
     if (!name) name = src;
     else name++;
 
-    char dest[1024];
+    char dest[8192];
     snprintf(dest, sizeof(dest), "%s/%s", E.filename, name);
 
     if (E.explorer_clip_is_cut) {
@@ -203,7 +203,7 @@ void explorerPaste(void) {
             editorSetStatusMessage("Error: Could not move %s", name);
         }
     } else {
-        char cmd[2048];
+        char cmd[16384];
         snprintf(cmd, sizeof(cmd), "cp -r \"%s\" \"%s\"", src, dest);
         if (system(cmd) == 0) {
             explorerRefresh();
