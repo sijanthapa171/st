@@ -5,7 +5,7 @@
 void editorProcessKeypress(void) {
     int c = editorReadKey();
     
-    if (E.mode == MODE_NORMAL) {
+    if (E.mode == MODE_NORMAL || E.mode == MODE_EXPLORER) {
         normalModeProcessKey(c);
     } else if (E.mode == MODE_INSERT) {
         insertModeProcessKey(c);
