@@ -466,6 +466,14 @@ flowchart LR
   ↑ left: filename + line count + dirty flag       ↑ right: [MODE] cur/total
 ```
 
+### 12.1 Line Numbering
+
+The editor displays a gutter on the left with line numbers. It follows a Vim-like relative numbering scheme:
+- **Active Line**: Displays its absolute line number in **bold yellow**.
+- **Other Lines**: Display their distance (relative) from the active line in **dim gray**.
+
+This design minimizes distractions while making jump-to-line operations (like `5j` or `3k`) easier to calculate at a glance.
+
 ---
 
 ## 13. File I/O Flow
