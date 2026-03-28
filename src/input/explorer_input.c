@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "editor.h"
 #include "input.h"
 #include "utils.h"
@@ -18,15 +19,43 @@ void explorerModeProcessKey(int c) {
             break;
 
         case 'q':
+            if (E.dirty && E.quit_times > 0) {
+                editorSetStatusMessage("WARNING!!! File has unsaved changes. "
+                                       "Press q %d more times to quit.", E.quit_times);
+                E.quit_times--;
+                return;
+            }
+            if (write(STDOUT_FILENO, "\x1b[2J", 4) == -1) {}
+            if (write(STDOUT_FILENO, "\x1b[H", 3) == -1) {}
+            exit(0);
+            break;
+
         case '\x1b':
             E.mode = MODE_NORMAL;
             editorSetStatusMessage("Returned to Normal Mode");
             break;
 
+        case ':':
+            E.mode = MODE_COMMAND;
+            commandModeProcess();
+            break;
+
+        case CTRL_KEY('q'):
+            if (E.dirty && E.quit_times > 0) {
+                editorSetStatusMessage("WARNING!!! File has unsaved changes. "
+                                       "Press Ctrl-Q %d more times to quit.", E.quit_times);
+                E.quit_times--;
+                return;
+            }
+            if (write(STDOUT_FILENO, "\x1b[2J", 4) == -1) {}
+            if (write(STDOUT_FILENO, "\x1b[H", 3) == -1) {}
+            exit(0);
+            break;
+
         case 'h':
         case ARROW_LEFT:
             {
-                char next_path[1024];
+                char next_path[4096];
                 char *last_slash = strrchr(E.filename, '/');
                 if (last_slash) {
                     if (last_slash == E.filename) strcpy(next_path, "/");
@@ -35,8 +64,12 @@ void explorerModeProcessKey(int c) {
                         strncpy(next_path, E.filename, path_len);
                         next_path[path_len] = '\0';
                     }
-                    editorOpen(next_path);
+                } else {
+                    if (strcmp(E.filename, ".") == 0) strcpy(next_path, "..");
+                    else if (strcmp(E.filename, "..") == 0) strcpy(next_path, "../..");
+                    else snprintf(next_path, sizeof(next_path), "%s/..", E.filename);
                 }
+                editorOpen(next_path);
             }
             break;
 

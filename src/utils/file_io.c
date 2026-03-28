@@ -54,15 +54,16 @@ char *editorRowsToString(int *buflen) {
 }
 
 void editorOpen(char *filename) {
+    char *new_filename = strdup(filename);
     editorClearBuffer();
     free(E.filename);
-    E.filename = strdup(filename);
+    E.filename = new_filename;
     E.cy = 0;
     E.cx = 0;
     
     struct stat statbuf;
-    if (stat(filename, &statbuf) == 0 && S_ISDIR(statbuf.st_mode)) {
-        DIR *d = opendir(filename);
+    if (stat(new_filename, &statbuf) == 0 && S_ISDIR(statbuf.st_mode)) {
+        DIR *d = opendir(new_filename);
         if (!d) {
             editorSetStatusMessage("Error: Could not open directory");
             return;
@@ -87,7 +88,7 @@ void editorOpen(char *filename) {
             int is_dir = (dir->d_type == DT_DIR);
             if (dir->d_type == DT_UNKNOWN) {
                 char full_path[1024];
-                snprintf(full_path, sizeof(full_path), "%s/%s", filename, dir->d_name);
+                snprintf(full_path, sizeof(full_path), "%s/%s", new_filename, dir->d_name);
                 struct stat entry_stat;
                 if (stat(full_path, &entry_stat) == 0 && S_ISDIR(entry_stat.st_mode)) {
                     is_dir = 1;
@@ -105,7 +106,7 @@ void editorOpen(char *filename) {
         char header[1024];
         editorInsertRow(E.numrows, "\" ============================================================================", 78);
         editorInsertRow(E.numrows, "\" Netrw Directory Listing", 25);
-        snprintf(header, sizeof(header), "\"   %s", filename);
+        snprintf(header, sizeof(header), "\"   %s", new_filename);
         editorInsertRow(E.numrows, header, strlen(header));
         editorInsertRow(E.numrows, "\" ============================================================================", 78);
 
@@ -124,15 +125,15 @@ void editorOpen(char *filename) {
         E.mode = MODE_EXPLORER;
         E.dirty = 0;
         E.cy = 4; 
-        editorSetStatusMessage("Opened directory: %s (%d items)", filename, count);
+        editorSetStatusMessage("Opened directory: %s (%d items)", new_filename, count);
         return;
     }
 
     E.mode = MODE_NORMAL;
     
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen(new_filename, "r");
     if (!fp) {
-        editorSetStatusMessage("Error: Could not open file %s", filename);
+        editorSetStatusMessage("Error: Could not open file %s", new_filename);
         return;
     }
     
